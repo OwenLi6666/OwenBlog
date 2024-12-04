@@ -9,30 +9,30 @@ import { siteConfig } from '@/lib/config'
  * 页脚
  */
 export default function Footer() {
-  const formRef = useRef()
-  const [success, setSuccess] = useState(false)
-  useEffect(() => {
-    const form = formRef.current
-    const handleSubmit = (e) => {
-      e.preventDefault()
-      const email = document.querySelector('#newsletter').value
-      subscribeToNewsletter(email).then(response => {
-        console.log('Subscription succeeded:', response)
-        // 在此处添加成功订阅后的操作
-        setSuccess(true)
-      })
-        .catch(error => {
-          console.error('Subscription failed:', error)
-          // 在此处添加订阅失败后的操作
-        })
-    }
-    form?.addEventListener('submit', handleSubmit)
-    return () => {
-      form?.removeEventListener('submit', handleSubmit)
-    }
-  }, [subscribeToNewsletter])
+    const formRef = useRef()
+    const [success, setSuccess] = useState(false)
+    useEffect(() => {
+        const form = formRef.current
+        const handleSubmit = (e) => {
+            e.preventDefault()
+            const email = document.querySelector('#newsletter').value
+            subscribeToNewsletter(email).then(response => {
+                console.log('Subscription succeeded:', response)
+                // 在此处添加成功订阅后的操作
+                setSuccess(true)
+            })
+                .catch(error => {
+                    console.error('Subscription failed:', error)
+                    // 在此处添加订阅失败后的操作
+                })
+        }
+        form?.addEventListener('submit', handleSubmit)
+        return () => {
+            form?.removeEventListener('submit', handleSubmit)
+        }
+    }, [subscribeToNewsletter])
 
-  return (
+    return (
         <footer>
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
@@ -76,16 +76,16 @@ export default function Footer() {
                         <h6 className="text-gray-800 font-medium mb-2">资源</h6>
                         <ul className="text-sm">
                             <li className="mb-2">
-                                <a href="https://docs.tangly1024.com" className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out">技术文档</a>
+                                <a href="https://docs.owenpower.com" className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out">技术文档</a>
                             </li>
                             <li className="mb-2">
-                                <a href="https://docs.tangly1024.com" className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out">教程指南</a>
+                                <a href="https://docs.owenpower.com" className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out">教程指南</a>
                             </li>
                             <li className="mb-2">
-                                <a href="https://blog.tangly1024.com" className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out">博客</a>
+                                <a href="https://blog.owenpower.com" className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out">博客</a>
                             </li>
                             <li className="mb-2">
-                                <a href="https://blog.tangly1024.com" className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out">支持中心</a>
+                                <a href="https://blog.owenpower.com" className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out">支持中心</a>
                             </li>
                             <li className="mb-2">
                                 <a href="#0" className="text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out">合作方</a>
@@ -150,9 +150,9 @@ export default function Footer() {
                     {/* Social as */}
                     <ul className="flex mb-4 md:order-1 md:ml-4 md:mb-0">
                         <li>
-                          <div className='h-full flex justify-center items-center text-gray-600 hover:text-gray-900 bg-white hover:bg-white-100'>
-                             Powered by<a href='https://github.com/tangly1024/NotionNext' className='mx-1 hover:underline font-semibold'>NotionNext {siteConfig('VERSION')}</a>
-                          </div>
+                            <div className='h-full flex justify-center items-center text-gray-600 hover:text-gray-900 bg-white hover:bg-white-100'>
+                                Powered by<a href='https://github.com/tangly1024/NotionNext' className='mx-1 hover:underline font-semibold'>NotionNext {siteConfig('VERSION')}</a>
+                            </div>
                         </li>
                         {/* <li>
               <a href="#0" className="flex justify-center items-center text-gray-600 hover:text-gray-900 bg-white hover:bg-white-100 rounded-full shadow transition duration-150 ease-in-out" aria-label="Twitter">
@@ -184,5 +184,5 @@ export default function Footer() {
 
             </div>
         </footer>
-  )
+    )
 }
