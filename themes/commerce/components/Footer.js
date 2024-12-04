@@ -97,34 +97,34 @@ const Footer = props => {
                       ),
                       true
                     ) && (
-                      <div>
-                        {
-                          <a
-                            target='_blank'
-                            rel='noreferrer'
-                            href={siteConfig('CONTACT_WHATSAPP', '#', CONFIG)}
-                            title={'telegram'}>
-                            <i className='transform hover:scale-125 duration-150 fa-brands fa-whatsapp dark:hover:text-red-400 hover:text-red-600' />
-                          </a>
-                        }
-                      </div>
-                    )}
+                        <div>
+                          {
+                            <a
+                              target='_blank'
+                              rel='noreferrer'
+                              href={siteConfig('CONTACT_WHATSAPP', '#', CONFIG)}
+                              title={'telegram'}>
+                              <i className='transform hover:scale-125 duration-150 fa-brands fa-whatsapp dark:hover:text-red-400 hover:text-red-600' />
+                            </a>
+                          }
+                        </div>
+                      )}
 
                     {JSON.parse(
                       siteConfig('COMMERCE_CONTACT_TELEGRAM_SHOW', true, CONFIG)
                     ) && (
-                      <div>
-                        {
-                          <a
-                            target='_blank'
-                            rel='noreferrer'
-                            href={siteConfig('CONTACT_TELEGRAM', '#', CONFIG)}
-                            title={'telegram'}>
-                            <i className='transform hover:scale-125 duration-150 fab fa-telegram dark:hover:text-red-400 hover:text-red-600' />
-                          </a>
-                        }
-                      </div>
-                    )}
+                        <div>
+                          {
+                            <a
+                              target='_blank'
+                              rel='noreferrer'
+                              href={siteConfig('CONTACT_TELEGRAM', '#', CONFIG)}
+                              title={'telegram'}>
+                              <i className='transform hover:scale-125 duration-150 fab fa-telegram dark:hover:text-red-400 hover:text-red-600' />
+                            </a>
+                          }
+                        </div>
+                      )}
                   </div>
                   <div className='text-lg'>
                     {' '}
@@ -195,7 +195,7 @@ const Footer = props => {
             <div className='text-xs text-light-500 dark:text-gray-700'>
               Powered by{' '}
               <a
-                href='https://github.com/tangly1024/NotionNext'
+                href='https://github.com/OwenLi6666/OwenBlog'
                 className='dark:text-gray-300'>
                 NotionNext {siteConfig('VERSION')}
               </a>

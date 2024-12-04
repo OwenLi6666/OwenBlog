@@ -1,11 +1,11 @@
 {
   "name": "notion-next",
   "version": "4.7.11",
-  "homepage": "https://github.com/tangly1024/NotionNext.git",
+  "homepage": "https://github.com/OwenLi6666/OwenBlog.git",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tangly1024/NotionNext.git"
+    "url": "https://github.com/OwenLi6666/OwenBlog.git"
   },
   "author": {
     "name": "tangly",
