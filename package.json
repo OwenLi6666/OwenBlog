@@ -1,7 +1,7 @@
 {
-  "name": "owen",
-  "version": "520",
-  "homepage": "https://github.com/OwenLi6666/OwenBlog.git",
+  "name": "notion-next",
+  "version": "4.7.12",
+  "homepage": "https://github.com/tangly1024/NotionNext.git",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -31,6 +31,7 @@
     "algoliasearch": "^4.18.0",
     "axios": "^1.7.2",
     "feed": "^4.2.2",
+    "ioredis": "^5.4.2",
     "js-md5": "^0.7.3",
     "lodash.throttle": "^4.1.1",
     "memory-cache": "^0.2.0",
