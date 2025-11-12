@@ -378,6 +378,14 @@ const getSEOMeta = (props, router, locale) => {
         slug: 'category',
         type: 'website'
       }
+    case '/arabic-player':
+      return {
+        title: `阿拉伯字母发音循环播放器 | ${siteInfo?.title}`,
+        description: '阿拉伯字母发音循环播放器，支持智能模式与定时模式，帮助快速记忆发音。',
+        image: `${siteInfo?.pageCover}`,
+        slug: 'arabic-player',
+        type: 'website'
+      }
     default:
       return {
         title: post

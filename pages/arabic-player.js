@@ -1,13 +1,34 @@
 import Head from 'next/head'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import BLOG from '@/blog.config'
+import { siteConfig } from '@/lib/config'
+import { getGlobalData } from '@/lib/db/getSiteData'
 
 export default function ArabicPlayer() {
+  const [isClient, setIsClient] = useState(false)
+
   useEffect(() => {
-    // 页面加载完成后初始化
-    if (typeof window !== 'undefined') {
-      initializePlayer();
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isClient || typeof window === 'undefined') {
+      return
     }
-  }, []);
+
+    const timer = setTimeout(() => {
+      if (typeof window.initializePlayer === 'function') {
+        window.initializePlayer()
+      }
+    }, 0)
+
+    return () => {
+      clearTimeout(timer)
+      if (typeof window !== 'undefined') {
+        window.__arabicPlayerInitialized = false
+      }
+    }
+  }, [isClient])
 
   return (
     <>
@@ -251,17 +272,42 @@ export default function ArabicPlayer() {
       `}</style>
 
       <div className="arabic-container">
+        {!isClient ? (
+          <div style={{ textAlign: 'center', padding: '40px 0' }}>
+            播放器加载中...
+          </div>
+        ) : (
+          <>
         <h1>🔤 阿拉伯字母发音循环播放器</h1>
         <p className="subtitle">Arabic Letters and Sounds - 智能播放版</p>
         
         <div className="mode-toggle">
           <label>
-            <input type="radio" name="mode" value="auto" defaultChecked onChange={(e) => switchMode('auto')} /> 
+            <input
+              type="radio"
+              name="mode"
+              value="auto"
+              defaultChecked
+              onChange={() =>
+                typeof window !== 'undefined' &&
+                typeof window.switchMode === 'function' &&
+                window.switchMode('auto')
+              }
+            /> 
             ✅ 智能模式（等待视频完成后播放下一个）
           </label>
           <br />
           <label style={{marginTop: '10px'}}>
-            <input type="radio" name="mode" value="manual" onChange={(e) => switchMode('manual')} /> 
+            <input
+              type="radio"
+              name="mode"
+              value="manual"
+              onChange={() =>
+                typeof window !== 'undefined' &&
+                typeof window.switchMode === 'function' &&
+                window.switchMode('manual')
+              }
+            /> 
             ⏱️ 定时模式（固定间隔时间，手动点击跳过）
           </label>
         </div>
@@ -278,16 +324,69 @@ export default function ArabicPlayer() {
         </div>
         
         <div className="controls">
-          <button className="btn-primary" id="startBtn" onClick={() => typeof window !== 'undefined' && window.startLoop()}>▶ 开始循环</button>
-          <button className="btn-secondary" id="pauseBtn" onClick={() => typeof window !== 'undefined' && window.pauseLoop()} disabled>⏸ 暂停</button>
-          <button className="btn-secondary" id="skipBtn" onClick={() => typeof window !== 'undefined' && window.skipToNext()} disabled>跳过</button>
-          <button className="btn-secondary" onClick={() => typeof window !== 'undefined' && window.resetLoop()}>🔄 重置</button>
+          <button
+            className="btn-primary"
+            id="startBtn"
+            onClick={() =>
+              typeof window !== 'undefined' &&
+              typeof window.startLoop === 'function' &&
+              window.startLoop()
+            }
+          >
+            ▶ 开始循环
+          </button>
+          <button
+            className="btn-secondary"
+            id="pauseBtn"
+            onClick={() =>
+              typeof window !== 'undefined' &&
+              typeof window.pauseLoop === 'function' &&
+              window.pauseLoop()
+            }
+            disabled
+          >
+            ⏸ 暂停
+          </button>
+          <button
+            className="btn-secondary"
+            id="skipBtn"
+            onClick={() =>
+              typeof window !== 'undefined' &&
+              typeof window.skipToNext === 'function' &&
+              window.skipToNext()
+            }
+            disabled
+          >
+            跳过
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() =>
+              typeof window !== 'undefined' &&
+              typeof window.resetLoop === 'function' &&
+              window.resetLoop()
+            }
+          >
+            🔄 重置
+          </button>
         </div>
         
         <div className="settings" id="manualSettings" style={{display: 'none'}}>
           <div className="setting-group">
             <label htmlFor="delaySlider">播放间隔时间: <strong id="delayValue">2</strong> 秒</label>
-            <input type="range" id="delaySlider" min="0.5" max="5" step="0.5" defaultValue="2" onChange={(e) => typeof window !== 'undefined' && window.updateDelay(e.target.value)} />
+            <input
+              type="range"
+              id="delaySlider"
+              min="0.5"
+              max="5"
+              step="0.5"
+              defaultValue="2"
+              onChange={e =>
+                typeof window !== 'undefined' &&
+                typeof window.updateDelay === 'function' &&
+                window.updateDelay(e.target.value)
+              }
+            />
           </div>
         </div>
         
@@ -304,22 +403,25 @@ export default function ArabicPlayer() {
           </div>
         </div>
         
-        <div className="letters-grid" id="lettersGrid"></div>
-        
-        <div className="video-preview">
-          <video id="videoPlayer" controls>
-            <source src="" type="video/mp4" />
-            您的浏览器不支持视频播放
-          </video>
-        </div>
-        
-        <div className="info">
-          ✅ 智能模式: 播放器会等待每个视频完成后自动播放下一个，避免卡顿时跳过
-        </div>
-      </div>
+            <div className="letters-grid" id="lettersGrid"></div>
+            
+            <div className="video-preview">
+              <video id="videoPlayer" controls>
+                <source src="" type="video/mp4" />
+                您的浏览器不支持视频播放
+              </video>
+            </div>
+            
+            <div className="info">
+              ✅ 智能模式: 播放器会等待每个视频完成后自动播放下一个，避免卡顿时跳过
+            </div>
 
-      <script dangerouslySetInnerHTML={{__html: `
-        function initializePlayer() {
+            <script dangerouslySetInnerHTML={{__html: `
+        window.initializePlayer = function() {
+        if (window.__arabicPlayerInitialized) {
+          return;
+        }
+        window.__arabicPlayerInitialized = true;
         // 完整的 28 个阿拉伯字母 URL
         const videoURLs = [
           'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_01_alif.mp4',
@@ -368,6 +470,10 @@ export default function ArabicPlayer() {
         function initializeUI() {
           videoPlayer = document.getElementById('videoPlayer');
           const grid = document.getElementById('lettersGrid');
+          if (!grid) {
+            return;
+          }
+          grid.innerHTML = '';
           letters.forEach((letter, index) => {
             const div = document.createElement('div');
             div.className = 'letter-item';
@@ -434,7 +540,12 @@ export default function ArabicPlayer() {
           currentIndex = index;
           updateProgress();
           
+          videoPlayer.pause();
+          videoPlayer.removeAttribute('src');
+          videoPlayer.load();
+
           videoPlayer.src = videoURLs[index];
+          videoPlayer.load();
           updateStatusInfo('正在加载...');
           
           videoPlayer.play().catch(err => {
@@ -531,7 +642,7 @@ export default function ArabicPlayer() {
         }
         
         // 切换播放模式
-        function switchMode(mode) {
+        window.switchMode = function(mode) {
           playMode = mode;
           const manualSettings = document.getElementById('manualSettings');
           
@@ -552,9 +663,42 @@ export default function ArabicPlayer() {
         
         // 初始化UI
         initializeUI();
+        window.switchMode(playMode);
         }
       `}} />
+          </>
+        )}
+      </div>
     </>
   )
+}
+
+
+export async function getStaticProps({ locale }) {
+  const props = await getGlobalData({ from: 'arabic-player', locale })
+  delete props.allPages
+
+  if (Array.isArray(props?.categoryOptions)) {
+    props.categoryOptions = props.categoryOptions.filter(Boolean)
+  } else {
+    props.categoryOptions = []
+  }
+
+  if (Array.isArray(props?.tagOptions)) {
+    props.tagOptions = props.tagOptions.filter(Boolean)
+  } else {
+    props.tagOptions = []
+  }
+
+  return {
+    props,
+    revalidate: process.env.EXPORT
+      ? undefined
+      : siteConfig(
+          'NEXT_REVALIDATE_SECOND',
+          BLOG.NEXT_REVALIDATE_SECOND,
+          props.NOTION_CONFIG
+        )
+  }
 }
 
