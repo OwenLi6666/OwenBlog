@@ -55,7 +55,18 @@ export const MenuList = ({ customNav, customMenu }) => {
 
   // 如果 开启自定义菜单，则覆盖 Page 生成的菜单
   if (siteConfig('CUSTOM_MENU')) {
-    links = customMenu
+    links = Array.isArray(customMenu) ? [...customMenu] : []
+  }
+
+  const arabicPlayerLink = {
+    icon: 'fas fa-language',
+    name: '阿拉伯语播放器',
+    href: '/arabic-player',
+    show: true
+  }
+
+  if (!links.some(link => link?.href === arabicPlayerLink.href)) {
+    links.push(arabicPlayerLink)
   }
 
   if (!links || links.length === 0) {
