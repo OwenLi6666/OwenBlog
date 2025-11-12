@@ -16,17 +16,335 @@ export default function ArabicPlayer() {
       return
     }
 
-    const timer = setTimeout(() => {
-      if (typeof window.initializePlayer === 'function') {
-        window.initializePlayer()
+    const videoURLs = [
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_01_alif.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_02_baa.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_03_taa.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_04_thaa.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_05_jiim.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_06_Haa.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_07_khaa.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_08_daal.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_09_dhaal.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_10_raa.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_11_zaay.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_12_seen.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_13_sheen.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_14_Saad.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_15_Daad.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_16_Taaa.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_17_Dhaa.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_18_ayn.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_19_ghayn.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_20_faa.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_21_qaaf.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_22_kaaf.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_23_laam.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_24_miim.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_25_nuun.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_26_ha.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_27_waaw.mp4',
+      'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_28_yaa.mp4'
+    ]
+
+    const letters = [
+      'ا',
+      'ب',
+      'ت',
+      'ث',
+      'ج',
+      'ح',
+      'خ',
+      'د',
+      'ذ',
+      'ر',
+      'ز',
+      'س',
+      'ش',
+      'ص',
+      'ض',
+      'ط',
+      'ظ',
+      'ع',
+      'غ',
+      'ف',
+      'ق',
+      'ك',
+      'ل',
+      'م',
+      'ن',
+      'ه',
+      'و',
+      'ي'
+    ]
+
+    let isPlaying = false
+    let currentIndex = 0
+    let delay = 2000
+    let currentLoopIteration = 0
+    let maxLoops = 0
+    let videoPlayer = null
+    let playMode = 'auto'
+    let nextVideoScheduled = false
+
+    const clearScheduledNext = () => {
+      nextVideoScheduled = false
+    }
+
+    const updateStatusInfo = text => {
+      const statusInfo = document.getElementById('statusInfo')
+      if (statusInfo) {
+        statusInfo.textContent = text
       }
-    }, 0)
+    }
+
+    const updateProgress = () => {
+      const currentLetter = document.getElementById('currentLetter')
+      const currentIndexEl = document.getElementById('currentIndex')
+      const progressFill = document.getElementById('progressFill')
+      if (currentLetter) {
+        currentLetter.textContent = letters[currentIndex]
+      }
+      if (currentIndexEl) {
+        currentIndexEl.textContent = currentIndex + 1
+      }
+      if (progressFill) {
+        const progress = ((currentIndex + 1) / letters.length) * 100
+        progressFill.style.width = progress + '%'
+      }
+
+      document.querySelectorAll('.letter-item').forEach((item, index) => {
+        item.classList.toggle('active', index === currentIndex)
+        item.classList.toggle('playing', index === currentIndex && isPlaying)
+      })
+    }
+
+    const onVideoEnded = () => {
+      if (isPlaying && playMode === 'auto') {
+        playNext()
+      }
+    }
+
+    const onVideoError = () => {
+      if (isPlaying && playMode === 'auto') {
+        setTimeout(playNext, 1000)
+      }
+    }
+
+    const onVideoPlaying = () => {
+      updateStatusInfo('正在播放中...')
+    }
+
+    const setupVideoEventListeners = () => {
+      if (!videoPlayer) return
+      videoPlayer.addEventListener('ended', onVideoEnded)
+      videoPlayer.addEventListener('error', onVideoError)
+      videoPlayer.addEventListener('playing', onVideoPlaying)
+    }
+
+    const removeVideoEventListeners = () => {
+      if (!videoPlayer) return
+      videoPlayer.removeEventListener('ended', onVideoEnded)
+      videoPlayer.removeEventListener('error', onVideoError)
+      videoPlayer.removeEventListener('playing', onVideoPlaying)
+    }
+
+    const playLetterVideo = index => {
+      currentIndex = index
+      updateProgress()
+
+      if (!videoPlayer) return
+      videoPlayer.pause()
+      videoPlayer.removeAttribute('src')
+      videoPlayer.load()
+
+      videoPlayer.src = videoURLs[index]
+      videoPlayer.load()
+
+      updateStatusInfo('正在加载...')
+
+      videoPlayer.play().catch(err => {
+        console.error('无法播放: ' + letters[index], err)
+        updateStatusInfo('加载失败: ' + err.message)
+      })
+    }
+
+    const playNext = () => {
+      if (!isPlaying) return
+      if (nextVideoScheduled) return
+      nextVideoScheduled = true
+
+      setTimeout(() => {
+        clearScheduledNext()
+        playLetterVideo(currentIndex)
+        currentIndex++
+
+        if (currentIndex >= letters.length) {
+          currentIndex = 0
+          currentLoopIteration++
+
+          if (maxLoops > 0 && currentLoopIteration >= maxLoops) {
+            isPlaying = false
+            const startBtn = document.getElementById('startBtn')
+            const pauseBtn = document.getElementById('pauseBtn')
+            const skipBtn = document.getElementById('skipBtn')
+            if (startBtn) startBtn.disabled = false
+            if (pauseBtn) pauseBtn.disabled = true
+            if (skipBtn) skipBtn.disabled = true
+            updateStatusInfo('循环播放已完成')
+            alert('✓ 循环播放已完成！')
+            return
+          }
+
+          const autoRestart = document.getElementById('autoRestart')
+          if (
+            autoRestart &&
+            !autoRestart.checked &&
+            currentLoopIteration > 0
+          ) {
+            isPlaying = false
+            const startBtn = document.getElementById('startBtn')
+            const pauseBtn = document.getElementById('pauseBtn')
+            const skipBtn = document.getElementById('skipBtn')
+            if (startBtn) startBtn.disabled = false
+            if (pauseBtn) pauseBtn.disabled = true
+            if (skipBtn) skipBtn.disabled = true
+            updateStatusInfo('已暂停')
+            return
+          }
+        }
+      }, playMode === 'auto' ? 300 : delay)
+    }
+
+    const startLoop = () => {
+      if (isPlaying) return
+      isPlaying = true
+      const startBtn = document.getElementById('startBtn')
+      const pauseBtn = document.getElementById('pauseBtn')
+      const skipBtn = document.getElementById('skipBtn')
+      if (startBtn) startBtn.disabled = true
+      if (pauseBtn) pauseBtn.disabled = false
+      if (skipBtn) skipBtn.disabled = false
+
+      const repeatCount = document.getElementById('repeatCount')
+      maxLoops = parseInt(repeatCount?.value, 10) || 0
+      currentLoopIteration = 0
+
+      playNext()
+    }
+
+    const skipToNext = () => {
+      if (isPlaying && videoPlayer) {
+        videoPlayer.pause()
+        playNext()
+      }
+    }
+
+    const pauseLoop = () => {
+      isPlaying = false
+      if (videoPlayer) {
+        videoPlayer.pause()
+      }
+      clearScheduledNext()
+      const startBtn = document.getElementById('startBtn')
+      const pauseBtn = document.getElementById('pauseBtn')
+      const skipBtn = document.getElementById('skipBtn')
+      if (startBtn) startBtn.disabled = false
+      if (pauseBtn) pauseBtn.disabled = true
+      if (skipBtn) skipBtn.disabled = true
+      updateStatusInfo('已暂停')
+    }
+
+    const resetLoop = () => {
+      isPlaying = false
+      clearScheduledNext()
+      currentIndex = 0
+      currentLoopIteration = 0
+      if (videoPlayer) {
+        videoPlayer.pause()
+        videoPlayer.currentTime = 0
+      }
+      const startBtn = document.getElementById('startBtn')
+      const pauseBtn = document.getElementById('pauseBtn')
+      const skipBtn = document.getElementById('skipBtn')
+      if (startBtn) startBtn.disabled = false
+      if (pauseBtn) pauseBtn.disabled = true
+      if (skipBtn) skipBtn.disabled = true
+      updateStatusInfo('已重置')
+      updateProgress()
+    }
+
+    const switchMode = mode => {
+      playMode = mode
+      const manualSettings = document.getElementById('manualSettings')
+      if (!manualSettings) return
+      if (mode === 'auto') {
+        manualSettings.style.display = 'none'
+        updateStatusInfo('智能模式：等待视频完成后播放下一个')
+      } else {
+        manualSettings.style.display = 'block'
+        updateStatusInfo('定时模式：按固定间隔播放')
+      }
+    }
+
+    const updateDelay = value => {
+      delay = parseFloat(value) * 1000
+      const delayValue = document.getElementById('delayValue')
+      if (delayValue) {
+        delayValue.textContent = value
+      }
+    }
+
+    const initializeUI = () => {
+      videoPlayer = document.getElementById('videoPlayer')
+      const grid = document.getElementById('lettersGrid')
+      const totalCount = document.getElementById('totalCount')
+
+      if (!videoPlayer || !grid || !totalCount) {
+        return
+      }
+
+      grid.innerHTML = ''
+      letters.forEach((letter, index) => {
+        const div = document.createElement('div')
+        div.className = 'letter-item'
+        div.textContent = letter
+        div.onclick = () => playLetterVideo(index)
+        grid.appendChild(div)
+      })
+
+      totalCount.textContent = letters.length
+      updateProgress()
+      setupVideoEventListeners()
+    }
+
+    const initializePlayer = () => {
+      if (window.__arabicPlayerInitialized) {
+        return
+      }
+      window.__arabicPlayerInitialized = true
+      initializeUI()
+      switchMode(playMode)
+    }
+
+    window.startLoop = startLoop
+    window.skipToNext = skipToNext
+    window.pauseLoop = pauseLoop
+    window.resetLoop = resetLoop
+    window.switchMode = switchMode
+    window.updateDelay = updateDelay
+
+    initializePlayer()
 
     return () => {
-      clearTimeout(timer)
-      if (typeof window !== 'undefined') {
-        window.__arabicPlayerInitialized = false
-      }
+      window.__arabicPlayerInitialized = false
+      delete window.startLoop
+      delete window.skipToNext
+      delete window.pauseLoop
+      delete window.resetLoop
+      delete window.switchMode
+      delete window.updateDelay
+      removeVideoEventListeners()
     }
   }, [isClient])
 
@@ -415,8 +733,12 @@ export default function ArabicPlayer() {
             <div className="info">
               ✅ 智能模式: 播放器会等待每个视频完成后自动播放下一个，避免卡顿时跳过
             </div>
+          </>
+        )}
+      </div>
 
-            <script dangerouslySetInnerHTML={{__html: `
+      {isClient && (
+        <script dangerouslySetInnerHTML={{__html: `
         window.initializePlayer = function() {
         if (window.__arabicPlayerInitialized) {
           return;
@@ -666,9 +988,7 @@ export default function ArabicPlayer() {
         window.switchMode(playMode);
         }
       `}} />
-          </>
-        )}
-      </div>
+      )}
     </>
   )
 }
