@@ -3,17 +3,8 @@ import { useEffect, useState } from 'react'
 import BLOG from '@/blog.config'
 import { siteConfig } from '@/lib/config'
 import { getGlobalData } from '@/lib/db/getSiteData'
-import { DynamicLayout } from '@/themes/theme'
 
 export default function ArabicPlayer(props) {
-  const theme = siteConfig('THEME', BLOG.THEME, props.NOTION_CONFIG)
-
-  return <DynamicLayout theme={theme} layoutName='LayoutBase' {...props}>
-    <ArabicPlayerContent />
-  </DynamicLayout>
-}
-
-function ArabicPlayerContent() {
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
