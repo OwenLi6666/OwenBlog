@@ -8,9 +8,9 @@
     "url": "https://github.com/OwenLi6666/OwenBlog.git"
   },
   "author": {
-    "name": "tangly",
-    "email": "mail@owenpower.com",
-    "url": "http://owenpower.com"
+    "name": "DragonLL",
+    "email": "mail@dragonll.com",
+    "url": "https://dragonll.com"
   },
   "scripts": {
     "dev": "next dev",

@@ -1,5 +1,29 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
-  "headers": []
+  "headers": [],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "owenpower.com"
+        }
+      ],
+      "destination": "https://dragonll.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.owenpower.com"
+        }
+      ],
+      "destination": "https://dragonll.com/:path*",
+      "permanent": true
+    }
+  ]
 }
