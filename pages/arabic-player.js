@@ -8,7 +8,7 @@ import { DynamicLayout } from '@/themes/theme'
 export default function ArabicPlayer(props) {
   const theme = siteConfig('THEME', BLOG.THEME, props.NOTION_CONFIG)
 
-  return <DynamicLayout theme={theme} layoutName='LayoutSlug' {...props}>
+  return <DynamicLayout theme={theme} layoutName='LayoutBase' {...props}>
     <ArabicPlayerContent />
   </DynamicLayout>
 }
