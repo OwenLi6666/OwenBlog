@@ -596,13 +596,14 @@ export default function ArabicPlayer(props) {
           background: #000;
           border-radius: 8px;
           overflow: hidden;
-          max-height: 300px;
         }
-        
+
         .arabic-container video {
           width: 100%;
           height: auto;
+          max-height: 600px;
           display: block;
+          object-fit: contain;
         }
         
         .info {
