@@ -3,8 +3,17 @@ import { useEffect, useState } from 'react'
 import BLOG from '@/blog.config'
 import { siteConfig } from '@/lib/config'
 import { getGlobalData } from '@/lib/db/getSiteData'
+import { DynamicLayout } from '@/themes/theme'
 
-export default function ArabicPlayer() {
+export default function ArabicPlayer(props) {
+  const theme = siteConfig('THEME', BLOG.THEME, props.NOTION_CONFIG)
+
+  return <DynamicLayout theme={theme} layoutName='LayoutSlug' {...props}>
+    <ArabicPlayerContent />
+  </DynamicLayout>
+}
+
+function ArabicPlayerContent() {
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
@@ -132,7 +141,7 @@ export default function ArabicPlayer() {
     }
 
     const onVideoPlaying = () => {
-      updateStatusInfo('正在播放中...')
+      updateStatusInfo('Playing...')
     }
 
     const setupVideoEventListeners = () => {
@@ -161,11 +170,11 @@ export default function ArabicPlayer() {
       videoPlayer.src = videoURLs[index]
       videoPlayer.load()
 
-      updateStatusInfo('正在加载...')
+      updateStatusInfo('Loading...')
 
       videoPlayer.play().catch(err => {
-        console.error('无法播放: ' + letters[index], err)
-        updateStatusInfo('加载失败: ' + err.message)
+        console.error('Unable to play: ' + letters[index], err)
+        updateStatusInfo('Loading failed: ' + err.message)
       })
     }
 
@@ -191,8 +200,8 @@ export default function ArabicPlayer() {
             if (startBtn) startBtn.disabled = false
             if (pauseBtn) pauseBtn.disabled = true
             if (skipBtn) skipBtn.disabled = true
-            updateStatusInfo('循环播放已完成')
-            alert('✓ 循环播放已完成！')
+            updateStatusInfo('Loop completed')
+            alert('✓ Loop playback completed!')
             return
           }
 
@@ -209,7 +218,7 @@ export default function ArabicPlayer() {
             if (startBtn) startBtn.disabled = false
             if (pauseBtn) pauseBtn.disabled = true
             if (skipBtn) skipBtn.disabled = true
-            updateStatusInfo('已暂停')
+            updateStatusInfo('Paused')
             return
           }
         }
@@ -252,7 +261,7 @@ export default function ArabicPlayer() {
       if (startBtn) startBtn.disabled = false
       if (pauseBtn) pauseBtn.disabled = true
       if (skipBtn) skipBtn.disabled = true
-      updateStatusInfo('已暂停')
+      updateStatusInfo('Paused')
     }
 
     const resetLoop = () => {
@@ -270,7 +279,7 @@ export default function ArabicPlayer() {
       if (startBtn) startBtn.disabled = false
       if (pauseBtn) pauseBtn.disabled = true
       if (skipBtn) skipBtn.disabled = true
-      updateStatusInfo('已重置')
+      updateStatusInfo('Reset')
       updateProgress()
     }
 
@@ -280,10 +289,10 @@ export default function ArabicPlayer() {
       if (!manualSettings) return
       if (mode === 'auto') {
         manualSettings.style.display = 'none'
-        updateStatusInfo('智能模式：等待视频完成后播放下一个')
+        updateStatusInfo('Smart Mode: Waits for video completion before playing next')
       } else {
         manualSettings.style.display = 'block'
-        updateStatusInfo('定时模式：按固定间隔播放')
+        updateStatusInfo('Timed Mode: Plays at fixed intervals')
       }
     }
 
@@ -351,34 +360,25 @@ export default function ArabicPlayer() {
   return (
     <>
       <Head>
-        <title>阿拉伯字母发音循环播放器 - Arabic Letters Player</title>
-        <meta name="description" content="阿拉伯字母发音学习工具 - Arabic alphabet pronunciation learning tool" />
+        <title>Arabic Letters Pronunciation Player</title>
+        <meta name="description" content="Arabic alphabet pronunciation learning tool with smart playback" />
       </Head>
       
       <style jsx global>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-        
-        body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          min-height: 100vh;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 20px;
-        }
-        
         .arabic-container {
           background: white;
+          dark:bg-gray-800;
           border-radius: 12px;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-          padding: 40px;
-          max-width: 700px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          padding: 32px;
+          margin: 20px auto;
+          max-width: 100%;
           width: 100%;
+        }
+
+        .dark .arabic-container {
+          background: #1f2937;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
         
         .arabic-container h1 {
@@ -387,12 +387,20 @@ export default function ArabicPlayer() {
           margin-bottom: 10px;
           font-size: 28px;
         }
-        
+
+        .dark .arabic-container h1 {
+          color: #f3f4f6;
+        }
+
         .subtitle {
           text-align: center;
           color: #666;
           margin-bottom: 30px;
           font-size: 14px;
+        }
+
+        .dark .subtitle {
+          color: #9ca3af;
         }
         
         .controls {
@@ -433,9 +441,18 @@ export default function ArabicPlayer() {
           background-color: #f0f0f0;
           color: #333;
         }
-        
+
+        .dark .btn-secondary {
+          background-color: #4b5563;
+          color: #e5e7eb;
+        }
+
         .btn-secondary:hover {
           background-color: #e0e0e0;
+        }
+
+        .dark .btn-secondary:hover {
+          background-color: #6b7280;
         }
         
         .settings {
@@ -443,6 +460,10 @@ export default function ArabicPlayer() {
           padding: 20px;
           border-radius: 8px;
           margin-bottom: 30px;
+        }
+
+        .dark .settings {
+          background: #374151;
         }
         
         .setting-group {
@@ -460,8 +481,12 @@ export default function ArabicPlayer() {
           font-weight: 500;
           font-size: 14px;
         }
+
+        .dark .arabic-container label {
+          color: #e5e7eb;
+        }
         
-        .arabic-container input[type="number"], 
+        .arabic-container input[type="number"],
         .arabic-container input[type="range"] {
           width: 100%;
           padding: 8px;
@@ -469,7 +494,13 @@ export default function ArabicPlayer() {
           border-radius: 4px;
           font-size: 14px;
         }
-        
+
+        .dark .arabic-container input[type="number"] {
+          background: #4b5563;
+          border-color: #6b7280;
+          color: #e5e7eb;
+        }
+
         .arabic-container input[type="range"] {
           padding: 0;
           height: 6px;
@@ -482,11 +513,20 @@ export default function ArabicPlayer() {
           border-radius: 4px;
           margin-bottom: 20px;
         }
-        
+
+        .dark .status {
+          background: #1e3a5f;
+          border-left-color: #667eea;
+        }
+
         .status-text {
           color: #1976d2;
           font-size: 14px;
           margin-bottom: 8px;
+        }
+
+        .dark .status-text {
+          color: #93c5fd;
         }
         
         .progress-bar {
@@ -523,9 +563,18 @@ export default function ArabicPlayer() {
           cursor: pointer;
           position: relative;
         }
-        
+
+        .dark .letter-item {
+          background: #4b5563;
+          color: #e5e7eb;
+        }
+
         .letter-item:hover {
           background: #e8e8e8;
+        }
+
+        .dark .letter-item:hover {
+          background: #6b7280;
         }
         
         .letter-item.active {
@@ -575,6 +624,11 @@ export default function ArabicPlayer() {
           margin-top: 20px;
           line-height: 1.5;
         }
+
+        .dark .info {
+          background: #064e3b;
+          color: #6ee7b7;
+        }
         
         .mode-toggle {
           background: #fef3c7;
@@ -583,21 +637,31 @@ export default function ArabicPlayer() {
           border-radius: 4px;
           margin-bottom: 20px;
         }
-        
+
+        .dark .mode-toggle {
+          background: #451a03;
+          border-left-color: #f59e0b;
+        }
+
         .mode-toggle label {
           margin-bottom: 0;
+          color: #78350f;
+        }
+
+        .dark .mode-toggle label {
+          color: #fcd34d;
         }
       `}</style>
 
       <div className="arabic-container">
         {!isClient ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            播放器加载中...
+            Loading player...
           </div>
         ) : (
           <>
-        <h1>🔤 阿拉伯字母发音循环播放器</h1>
-        <p className="subtitle">Arabic Letters and Sounds - 智能播放版</p>
+        <h1>🔤 Arabic Letters Pronunciation Player</h1>
+        <p className="subtitle">Arabic Letters and Sounds - Smart Playback Edition</p>
         
         <div className="mode-toggle">
           <label>
@@ -611,8 +675,8 @@ export default function ArabicPlayer() {
                 typeof window.switchMode === 'function' &&
                 window.switchMode('auto')
               }
-            /> 
-            ✅ 智能模式（等待视频完成后播放下一个）
+            />
+            ✅ Smart Mode (Wait for video completion before playing next)
           </label>
           <br />
           <label style={{marginTop: '10px'}}>
@@ -625,14 +689,14 @@ export default function ArabicPlayer() {
                 typeof window.switchMode === 'function' &&
                 window.switchMode('manual')
               }
-            /> 
-            ⏱️ 定时模式（固定间隔时间，手动点击跳过）
+            />
+            ⏱️ Timed Mode (Fixed interval, manually skip)
           </label>
         </div>
         
         <div className="status">
           <div className="status-text">
-            当前进度: <strong id="currentLetter">ا</strong> 
+            Current Progress: <strong id="currentLetter">ا</strong>
             (<span id="currentIndex">1</span>/<span id="totalCount">28</span>)
             <span id="statusInfo" style={{marginLeft: '10px', color: '#666', fontSize: '12px'}}></span>
           </div>
@@ -651,7 +715,7 @@ export default function ArabicPlayer() {
               window.startLoop()
             }
           >
-            ▶ 开始循环
+            ▶ Start Loop
           </button>
           <button
             className="btn-secondary"
@@ -663,7 +727,7 @@ export default function ArabicPlayer() {
             }
             disabled
           >
-            ⏸ 暂停
+            ⏸ Pause
           </button>
           <button
             className="btn-secondary"
@@ -675,7 +739,7 @@ export default function ArabicPlayer() {
             }
             disabled
           >
-            跳过
+            Skip
           </button>
           <button
             className="btn-secondary"
@@ -685,13 +749,13 @@ export default function ArabicPlayer() {
               window.resetLoop()
             }
           >
-            🔄 重置
+            🔄 Reset
           </button>
         </div>
         
         <div className="settings" id="manualSettings" style={{display: 'none'}}>
           <div className="setting-group">
-            <label htmlFor="delaySlider">播放间隔时间: <strong id="delayValue">2</strong> 秒</label>
+            <label htmlFor="delaySlider">Playback Interval: <strong id="delayValue">2</strong> seconds</label>
             <input
               type="range"
               id="delaySlider"
@@ -707,16 +771,16 @@ export default function ArabicPlayer() {
             />
           </div>
         </div>
-        
+
         <div className="settings">
           <div className="setting-group">
-            <label htmlFor="repeatCount">循环次数: <strong id="repeatValue">∞ (无限)</strong></label>
-            <input type="number" id="repeatCount" min="1" max="100" defaultValue="0" placeholder="0 = 无限循环" />
+            <label htmlFor="repeatCount">Loop Count: <strong id="repeatValue">∞ (Infinite)</strong></label>
+            <input type="number" id="repeatCount" min="1" max="100" defaultValue="0" placeholder="0 = Infinite loop" />
           </div>
-          
+
           <div className="setting-group">
             <label>
-              <input type="checkbox" id="autoRestart" defaultChecked /> 循环完成后自动重新开始
+              <input type="checkbox" id="autoRestart" defaultChecked /> Auto-restart when loop completes
             </label>
           </div>
         </div>
@@ -726,12 +790,12 @@ export default function ArabicPlayer() {
             <div className="video-preview">
               <video id="videoPlayer" controls>
                 <source src="" type="video/mp4" />
-                您的浏览器不支持视频播放
+                Your browser does not support video playback
               </video>
             </div>
-            
+
             <div className="info">
-              ✅ 智能模式: 播放器会等待每个视频完成后自动播放下一个，避免卡顿时跳过
+              ✅ Smart Mode: Player waits for each video to complete before automatically playing the next, avoiding skips during buffering
             </div>
           </>
         )}
@@ -744,7 +808,7 @@ export default function ArabicPlayer() {
           return;
         }
         window.__arabicPlayerInitialized = true;
-        // 完整的 28 个阿拉伯字母 URL
+        // Complete list of 28 Arabic letter video URLs
         const videoURLs = [
           'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_01_alif.mp4',
           'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_02_baa.mp4',
@@ -776,7 +840,7 @@ export default function ArabicPlayer() {
           'https://lingco-classroom-prod.s3.us-east-2.amazonaws.com/uploaded_video/master_files/alif_baa/AB3e_pronouncing_28_yaa.mp4'
         ];
         
-        // 阿拉伯字母列表
+        // Arabic letters list
         const letters = ['ا', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي'];
         
         let isPlaying = false;
@@ -788,7 +852,7 @@ export default function ArabicPlayer() {
         let playMode = 'auto';
         let nextVideoScheduled = false;
         
-        // 初始化界面
+        // Initialize UI
         function initializeUI() {
           videoPlayer = document.getElementById('videoPlayer');
           const grid = document.getElementById('lettersGrid');
@@ -809,40 +873,40 @@ export default function ArabicPlayer() {
           setupVideoEventListeners();
         }
         
-        // 设置视频事件监听
+        // Setup video event listeners
         function setupVideoEventListeners() {
           videoPlayer.addEventListener('ended', onVideoEnded);
           videoPlayer.addEventListener('error', onVideoError);
           videoPlayer.addEventListener('playing', onVideoPlaying);
         }
         
-        // 视频播放完成时的事件
+        // Event when video playback completes
         function onVideoEnded() {
           if (isPlaying && playMode === 'auto') {
-            console.log('视频播放完成，准备播放下一个');
+            console.log('Video completed, preparing to play next');
             playNext();
           }
         }
         
-        // 视频加载出错时的事件
+        // Event when video loading fails
         function onVideoError() {
-          console.warn('视频加载出错', videoPlayer.error);
+          console.warn('Video loading error', videoPlayer.error);
           if (isPlaying && playMode === 'auto') {
             setTimeout(playNext, 1000);
           }
         }
         
-        // 视频开始播放时
+        // Event when video starts playing
         function onVideoPlaying() {
-          updateStatusInfo('正在播放中...');
+          updateStatusInfo('Playing...');
         }
         
-        // 更新状态信息
+        // Update status information
         function updateStatusInfo(text) {
           document.getElementById('statusInfo').textContent = text;
         }
         
-        // 更新进度显示
+        // Update progress display
         function updateProgress() {
           document.getElementById('currentLetter').textContent = letters[currentIndex];
           document.getElementById('currentIndex').textContent = currentIndex + 1;
@@ -850,14 +914,14 @@ export default function ArabicPlayer() {
           const progress = ((currentIndex + 1) / letters.length) * 100;
           document.getElementById('progressFill').style.width = progress + '%';
           
-          // 更新字母高亮
+          // Update letter highlighting
           document.querySelectorAll('.letter-item').forEach((item, index) => {
             item.classList.toggle('active', index === currentIndex);
             item.classList.toggle('playing', index === currentIndex && isPlaying);
           });
         }
         
-        // 播放字母视频
+        // Play letter video
         function playLetterVideo(index) {
           currentIndex = index;
           updateProgress();
@@ -868,15 +932,15 @@ export default function ArabicPlayer() {
 
           videoPlayer.src = videoURLs[index];
           videoPlayer.load();
-          updateStatusInfo('正在加载...');
+          updateStatusInfo('Loading...');
           
           videoPlayer.play().catch(err => {
-            console.error('无法播放: ' + letters[index], err);
-            updateStatusInfo('加载失败: ' + err.message);
+            console.error('Unable to play: ' + letters[index], err);
+            updateStatusInfo('Loading failed: ' + err.message);
           });
         }
         
-        // 启动循环播放
+        // Start loop playback
         window.startLoop = function() {
           if (isPlaying) return;
           isPlaying = true;
@@ -890,7 +954,7 @@ export default function ArabicPlayer() {
           playNext();
         }
         
-        // 播放下一个字母
+        // Play next letter
         function playNext() {
           if (!isPlaying) return;
           
@@ -912,8 +976,8 @@ export default function ArabicPlayer() {
                 document.getElementById('startBtn').disabled = false;
                 document.getElementById('pauseBtn').disabled = true;
                 document.getElementById('skipBtn').disabled = true;
-                updateStatusInfo('循环播放已完成');
-                alert('✓ 循环播放已完成！');
+                updateStatusInfo('Loop completed');
+                alert('✓ Loop playback completed!');
                 return;
               }
               
@@ -922,14 +986,14 @@ export default function ArabicPlayer() {
                 document.getElementById('startBtn').disabled = false;
                 document.getElementById('pauseBtn').disabled = true;
                 document.getElementById('skipBtn').disabled = true;
-                updateStatusInfo('已暂停');
+                updateStatusInfo('Paused');
                 return;
               }
             }
           }, playMode === 'auto' ? 300 : delay);
         }
         
-        // 手动跳过到下一个
+        // Manually skip to next
         window.skipToNext = function() {
           if (isPlaying) {
             videoPlayer.pause();
@@ -937,7 +1001,7 @@ export default function ArabicPlayer() {
           }
         }
         
-        // 暂停播放
+        // Pause playback
         window.pauseLoop = function() {
           isPlaying = false;
           videoPlayer.pause();
@@ -945,10 +1009,10 @@ export default function ArabicPlayer() {
           document.getElementById('startBtn').disabled = false;
           document.getElementById('pauseBtn').disabled = true;
           document.getElementById('skipBtn').disabled = true;
-          updateStatusInfo('已暂停');
+          updateStatusInfo('Paused');
         }
-        
-        // 重置
+
+        // Reset
         window.resetLoop = function() {
           isPlaying = false;
           nextVideoScheduled = false;
@@ -959,31 +1023,31 @@ export default function ArabicPlayer() {
           document.getElementById('startBtn').disabled = false;
           document.getElementById('pauseBtn').disabled = true;
           document.getElementById('skipBtn').disabled = true;
-          updateStatusInfo('已重置');
+          updateStatusInfo('Reset');
           updateProgress();
         }
         
-        // 切换播放模式
+        // Switch playback mode
         window.switchMode = function(mode) {
           playMode = mode;
           const manualSettings = document.getElementById('manualSettings');
           
           if (mode === 'auto') {
             manualSettings.style.display = 'none';
-            updateStatusInfo('智能模式：等待视频完成后播放下一个');
+            updateStatusInfo('Smart Mode: Waits for video completion before playing next');
           } else {
             manualSettings.style.display = 'block';
-            updateStatusInfo('定时模式：按固定间隔播放');
+            updateStatusInfo('Timed Mode: Plays at fixed intervals');
           }
         }
         
-        // 更新延迟时间
+        // Update delay time
         window.updateDelay = function(value) {
           delay = parseFloat(value) * 1000;
           document.getElementById('delayValue').textContent = value;
         }
         
-        // 初始化UI
+        // Initialize UI
         initializeUI();
         window.switchMode(playMode);
         }
