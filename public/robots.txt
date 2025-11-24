@@ -1,0 +1,44 @@
+
+    # Default: Allow all bots
+    User-agent: *
+    Allow: /
+    Crawl-delay: 10
+
+    # OpenAI GPT (ChatGPT)
+    User-agent: GPTBot
+    Allow: /
+    Crawl-delay: 10
+
+    # Google AI (Bard/Gemini)
+    User-agent: Google-Extended
+    Allow: /
+
+    # Anthropic Claude
+    User-agent: Claude-Web
+    Allow: /
+    Crawl-delay: 10
+
+    # Common Crawl (研究用途)
+    User-agent: CCBot
+    Allow: /
+    Crawl-delay: 20
+
+    # Block aggressive scrapers
+    User-agent: SemrushBot
+    Disallow: /
+
+    User-agent: AhrefsBot
+    Disallow: /
+
+    # Protect admin/private areas (if any)
+    User-agent: *
+    Disallow: /admin/
+    Disallow: /api/private/
+    Disallow: /*.json$
+
+    # Host
+    Host: https://dragonll.com
+
+    # Sitemaps
+    Sitemap: https://dragonll.com/sitemap.xml
+
