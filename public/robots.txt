@@ -36,7 +36,7 @@ Disallow: /api/private/
 Disallow: /*.json$
 
 # Host
-Host: https://preview.tangly1024.com
+Host: https://dragonll.com
 
 # Sitemaps
-Sitemap: https://preview.tangly1024.com/sitemap.xml
+Sitemap: https://dragonll.com/sitemap.xml
