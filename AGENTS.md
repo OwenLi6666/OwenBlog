@@ -147,6 +147,33 @@ Next 14.2 → **15.5.24**、notion-client 7.7.1 → **7.12.1**，解决 32 个�
    正确写法是 `'@waline/client/style'`。这个坑 2024 年踩过一次，merge 会把旧写法带回来。
 3. **`.github/workflows/sync.yaml` 的 `upstream_sync_repo`。** 曾被全局替换成自己的仓库
    （等于从自己同步到自己）。正确值是 `notionnext-org/NotionNext`。
+4. **`yarn dev` 时 `/sitemap.xml` 报 500。** 上游的 `lib/utils/sitemap.xml.js` 在构建时会写
+   `public/sitemap.xml`，而 `pages/sitemap.xml.js` 又是动态路由，两者在 dev 下冲突
+   （`A conflicting public file and page file was found`）。
+   跑过 `yarn build` 之后再 `yarn dev`，就会遇到。删掉那个残留文件即可（它已被 gitignore）：
+
+   ```bash
+   rm -f public/sitemap.xml sitemap.xml
+   ```
+
+## 5d. 本地验证清单（2026-09-05 全部通过，用官方 demo 数据）
+
+```bash
+owenblog && yarn dev     # ~/.zshrc 里的函数，自动切 node@22
+```
+
+| 检查项 | 期望 |
+| --- | --- |
+| 首页 | `posts = 12`、`siteInfo.title` 非空、32 个 meta |
+| `/arabic-player` | HTTP 200、32 个 meta、`og:title` 是自定义那句中文 |
+| 页脚 | 出现 `Powered by ... DragonLL` |
+| 首页菜单 | 含 `href="/arabic-player"` |
+| `/robots.txt` | 含 GPTBot / Claude-Web 等自定义规则 |
+| `/sitemap.xml` | 40 条 `<loc>` |
+| `/article/<slug>` | HTTP 200（注意 demo 数据的 slug 本身就含 `article/` 前缀） |
+
+⚠️ dev 首次请求某个页面时 Next 还在编译，可能返回只有 2 个 meta 的半成品页面。
+**别把这个当成回归** —— 等编译完再请求一次。
 
 ## 5c. 上游遗留的警告（不阻塞构建，早晚要处理）
 
