@@ -85,7 +85,21 @@ yarn dev        # 不配 NOTION_PAGE_ID 时会回退到 NotionNext 官方 demo �
 真实的 Notion 根页面 ID **不在本仓库任何地方**，只存在于 Vercel 的环境变量里
 （`.env.local` 只有 BIO / 邮箱 / Twitter；`blog.config.js` 里那个是上游 demo 的 ID）。
 
-## 4. ⚠️ 已知问题：线上是空站（2026-09-05 确认，未修）
+## 4. ✅ 已修复：线上空站（2026-09-05 当天定位并修复）
+
+**结论：部署 v4.10.10 后当场恢复。** 2026-09-05 10:28 推送 main，Vercel 自动构建完成后
+`posts` 从 0 变 3、标题从 `undefined | undefined` 变成
+`LongLi | Building, Learning, Testing, Improving, Sharing`、sitemap 从 0 篇变 3 篇文章。
+
+最可能的直接原因是**上游把 Notion API 地址从 `www.notion.so/api/v3` 改成了 `app.notion.com/api/v3`**
+（Notion 迁了域名），旧代码还打老地址。但严格说这没被单独证明 —— 一次性合了 690 个提交，
+无法确定是哪一个修好的。其他候选（`notion-client` 7.7.1 → 7.12.1、新增 `RateLimiter.ts`、
+`NEXT_REVALIDATE_SECOND` 5 → 60）也都可能有贡献。
+
+⚠️ 部署后头一两分钟首页可能只有 2 个 meta、没有 `<title>` —— 那是部署瞬间缓存下来的坏渲染。
+等 ISR 的 60 秒窗口过去（响应头出现 `x-vercel-cache: STALE`）就会自动重建恢复，不用动手。
+
+<details><summary>以下是修复前的排查记录（保留备查）</summary>
 
 dragonll.com 服务正常，但**每个页面都渲染 0 篇文章**：`posts=0`、`siteInfo=null`、
 网页标题是 `undefined | undefined`、动态 sitemap 里零篇文章。`/rss/feed.xml` 里还有 6 篇，
@@ -115,6 +129,8 @@ dragonll.com 服务正常，但**每个页面都渲染 0 篇文章**：`posts=0`
 2. 是否配了 `REDIS_URL` 之类的缓存后端而实例已失效
 3. Notion 对 Vercel 出口 IP 限流（旧配置 `NEXT_REVALIDATE_SECOND=5`，每 5 秒就可能回源一次；
    合并后已跟随上游默认改为 60，上游同期新增 `RateLimiter.ts` 也指向这个方向）
+
+</details>
 
 ## 5. 上游同步（2026-09-05 已完成一次）
 
