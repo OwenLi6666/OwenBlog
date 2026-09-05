@@ -51,7 +51,7 @@ const Footer = ({ title }) => {
         <span className='text-xs '>
           Powered by{' '}
           <a
-            href='https://github.com/OwenLi6666/OwenBlog'
+            href='https://github.com/notionnext-org/NotionNext'
             className='underline dark:text-gray-300'>
             NotionNext {siteConfig('VERSION')}
           </a>

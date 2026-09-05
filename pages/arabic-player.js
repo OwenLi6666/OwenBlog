@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import BLOG from '@/blog.config'
 import { siteConfig } from '@/lib/config'
-import { getGlobalData } from '@/lib/db/getSiteData'
+import { fetchGlobalAllData } from '@/lib/db/SiteDataApi'
 
 export default function ArabicPlayer(props) {
   const [isClient, setIsClient] = useState(false)
@@ -1051,7 +1051,7 @@ export default function ArabicPlayer(props) {
 
 
 export async function getStaticProps({ locale }) {
-  const props = await getGlobalData({ from: 'arabic-player', locale })
+  const props = await fetchGlobalAllData({ from: 'arabic-player', locale })
   delete props.allPages
 
   if (Array.isArray(props?.categoryOptions)) {

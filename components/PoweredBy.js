@@ -11,7 +11,7 @@ export default function PoweredBy(props) {
       <a
         href='https://github.com/OwenLi6666/OwenBlog'
         className='underline justify-start'>
-        owen {siteConfig('VERSION')}
+        DragonLL {siteConfig('VERSION')}
       </a>
       .
     </div>

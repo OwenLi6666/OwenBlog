@@ -42,7 +42,11 @@ const Footer = ({ title }) => {
         <br />
         <h1>{title}</h1>
         <span className='text-xs font-serif  text-gray-500 dark:text-gray-300 '>
-          Powered by dragon
+          Powered by{' '}
+          <a href='https://github.com/OwenLi6666/OwenBlog' className='underline '>
+            DragonLL {siteConfig('VERSION')}
+          </a>
+          .
         </span>
       </span>
     </footer>
