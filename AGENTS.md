@@ -55,8 +55,24 @@ ln -s /opt/homebrew/Cellar/simdjson/4.1.0/lib/libsimdjson.28.0.0.dylib \
 
 ## 2. 包管理器：跟上游走用 yarn，不要用 npm
 
-上游是 `yarn@1.22.22` + `yarn.lock`。本仓库历史上被切成过 npm + `package-lock.json`，
-那是 `yarn.lock` 里 2847 行删除的来源，也是和上游对不上的原因之一。同步上游时切回 yarn。
+上游是 `yarn@1.22.22` + `yarn.lock`（`package.json#packageManager` 已声明）。
+本仓库历史上被切成过 npm，2026-09-05 已切回 yarn 并删除 `package-lock.json`。
+
+本机没有全局 yarn，用 node@22 自带的 corepack 提供：
+
+```bash
+export PATH="/opt/homebrew/opt/node@22/bin:$PATH"
+corepack enable   # shim 只落在 node@22 的 bin 里，不影响全局 node 25
+```
+
+### ⚠️ yarn.lock 的下载地址指向国内镜像
+
+上游作者在国内生成锁文件，`yarn.lock` 里有 700 条 `resolved` 指向
+`registry.npmmirror.com`，**从阿布扎比拉 tarball 会反复 `ESOCKETTIMEDOUT`**
+（元数据请求能通，所以看起来像网络好的，其实卡在下载）。
+已全部改写成 `registry.yarnpkg.com`（版本号与 integrity 不变，只换下载主机）。
+
+**每次同步上游后都要重做这一步**，否则 `yarn install` 会挂十几分钟然后失败。
 
 ## 3. 本地开发
 
@@ -76,23 +92,66 @@ dragonll.com 服务正常，但**每个页面都渲染 0 篇文章**：`posts=0`
 但那是 2025-12-31 构建时写死的静态文件。
 
 **Notion 侧已排除** —— 直接打 Notion 公开 API 验过，数据库 `LongLi`（id `191326a0-88b7-4a02-ace1-1547433a967a`）
-和文章都能正常读出，分享权限没丢。问题在 Vercel 那一侧，候选：`NOTION_PAGE_ID` 环境变量、
-Redis 缓存后端失效、Notion 限流。NotionNext 抓取失败会静默返回空，从外部看不出区别，
-**必须看 Vercel Runtime Logs 才能定位。**
+和文章都能正常读出，分享权限没丢。
 
-## 5. 与上游的差距（2026-09-05）
+**代码版本也已排除**（2026-09-05）—— 升到 v4.10.10 后本地 `yarn build` 用官方 demo 数据
+成功预渲染出文章页，说明 Next 15 + notion-client 7.12.1 这条取数链路本身是通的。
 
-落后 **690 个提交**（约 9 个月），上游已到 v4.10.10：Next 14.2 → 15.5、notion-client 7.7.1 → 7.12.1，
-且**取数层被整体重写** —— `lib/db/getSiteData.js` 已删除，拆成 `lib/db/SiteDataApi.js` +
-`lib/db/notion/*` + `lib/cache/*`，新增 `RateLimiter.ts`。预演合并有 31 个冲突文件。
+所以问题在 Vercel 那一侧，候选：`NOTION_PAGE_ID` 环境变量、Redis 缓存后端失效、Notion 限流。
+NotionNext 抓取失败会静默返回空，从外部看不出区别，**必须看 Vercel Runtime Logs 才能定位**，
+或者拿真实 `NOTION_PAGE_ID` 在本地 `yarn dev` 复现一次。
 
-本仓库自己的 56 个提交里，真正有价值的只有：`pages/arabic-player.js`（1080 行原创）、
-`themes/next/components/MenuList.js` 的菜单插入、`components/SEO.js` 的 `/arabic-player` meta、
-`vercel.json` 的 owenpower.com → dragonll.com 301、自定义 `public/robots.txt`。
-其余是把 14 个**未使用主题**的 Footer 品牌名换掉 —— 那是每次同步冲突的主要来源，可安全丢弃。
+顺带：旧配置里 `NEXT_REVALIDATE_SECOND` 是 5 秒（上游默认 60），
+意味着页面每 5 秒就可能回源打一次 Notion —— 这是限流假说的一个可疑点。合并后已跟随上游改为 60。
 
-`blog.config.js` 里改了值的只有 12 个键，**全部都能用 `NEXT_PUBLIC_*` 环境变量覆盖**，
-不需要改代码（注意关键词那个变量名是 `NEXT_PUBLIC_KEYWORD`，不带 s）。
+## 5. 上游同步（2026-09-05 已完成一次）
+
+分支 `sync-upstream-20260905` 已把上游 **v4.10.10** 合进来：落后的 690 个提交清零，
+Next 14.2 → **15.5.24**、notion-client 7.7.1 → **7.12.1**，解决 32 个冲突文件。
+备份在 tag `backup-before-upgrade-20260905` 和分支 `backup/main-20260905`。
+
+取数层被上游整体重写：`lib/db/getSiteData.js` **已删除**，拆成 `lib/db/SiteDataApi.js`
++ `lib/db/notion/*` + `lib/cache/*`，新增 `RateLimiter.ts`。
+函数改名 `getGlobalData()` → `fetchGlobalAllData()`（参数不变），
+`pages/arabic-player.js` 的 import 已同步修正。
+
+### 必须保留的自定义（同步时逐项确认）
+
+| 内容 | 位置 |
+| --- | --- |
+| 阿拉伯字母播放器（1080 行原创） | `pages/arabic-player.js` |
+| 菜单入口 | `themes/next/components/MenuList.js` |
+| `/arabic-player` 的 meta | `components/SEO.js` |
+| owenpower.com → dragonll.com 301 | `vercel.json` |
+| AI 爬虫策略 | `lib/utils/robots.txt.js`（**不是** `public/robots.txt`，见下） |
+| 12 个站点配置值 | `blog.config.js` |
+
+`blog.config.js` 的 12 个值**全部能用 `NEXT_PUBLIC_*` 环境变量覆盖**
+（关键词那个变量名是 `NEXT_PUBLIC_KEYWORD`，不带 s）。
+上游 v4.10 起把 `TITLE` / `DESCRIPTION` 移出了配置，但 `components/SEO.js` 等 8 处仍在
+调 `siteConfig('TITLE')` —— 已手工补回这两个键作兜底，否则 Notion 挂掉时标题会渲染成
+`undefined | undefined`。
+
+### 可安全丢弃的（每次同步的冲突大头）
+
+14 个**未使用主题**的 Footer / config 里的品牌替换。那些改动本身就是坏的：
+只换了链接没换文字，且指向已废弃的 `owenpower.com`。2026-09-05 已全部采纳上游。
+页脚品牌统一为 `DragonLL`（此前 `owen` / `dragon` / `DragonLL` 三个名字并存）。
+
+## 5b. 同步时会咬人的三个坑（都已踩过）
+
+1. **`public/robots.txt` 会被构建覆盖。** 上游的 `lib/utils/robots.txt.js` 在构建时
+   无条件写这个文件，绕过 `next-sitemap` 的 `generateRobotsTxt: false`。
+   自定义规则必须写进**生成器模板**，改静态文件没用。
+2. **`@waline/client` 3.x 的 CSS 路径。** `'./dist/waline.css'` 不再被 exports 导出，
+   正确写法是 `'@waline/client/style'`。这个坑 2024 年踩过一次，merge 会把旧写法带回来。
+3. **`.github/workflows/sync.yaml` 的 `upstream_sync_repo`。** 曾被全局替换成自己的仓库
+   （等于从自己同步到自己）。正确值是 `notionnext-org/NotionNext`。
+
+## 5c. 上游遗留的警告（不阻塞构建，早晚要处理）
+
+- `next.config.js` 里的 `swcMinify` 在 Next 15 已不是合法配置项
+- `publicRuntimeConfig` 会在 Next 16 被移除
 
 ## 6. 禁止 / 注意
 
