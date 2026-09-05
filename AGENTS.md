@@ -94,15 +94,27 @@ dragonll.com 服务正常，但**每个页面都渲染 0 篇文章**：`posts=0`
 **Notion 侧已排除** —— 直接打 Notion 公开 API 验过，数据库 `LongLi`（id `191326a0-88b7-4a02-ace1-1547433a967a`）
 和文章都能正常读出，分享权限没丢。
 
-**代码版本也已排除**（2026-09-05）—— 升到 v4.10.10 后本地 `yarn build` 用官方 demo 数据
-成功预渲染出文章页，说明 Next 15 + notion-client 7.12.1 这条取数链路本身是通的。
+**代码也已排除，且是用真实数据证明的**（2026-09-05）。真实根页面
+`NOTION_PAGE_ID=683074dc94a94360b7a74133d974ced6`（已写入本地 `.env.local`，该文件被 gitignore）。
 
-所以问题在 Vercel 那一侧，候选：`NOTION_PAGE_ID` 环境变量、Redis 缓存后端失效、Notion 限流。
-NotionNext 抓取失败会静默返回空，从外部看不出区别，**必须看 Vercel Runtime Logs 才能定位**，
-或者拿真实 `NOTION_PAGE_ID` 在本地 `yarn dev` 复现一次。
+同一时刻的对照实验：
 
-顺带：旧配置里 `NEXT_REVALIDATE_SECOND` 是 5 秒（上游默认 60），
-意味着页面每 5 秒就可能回源打一次 Notion —— 这是限流假说的一个可疑点。合并后已跟随上游改为 60。
+| | 本地 v4.10.10 + 真实 NOTION_PAGE_ID | 线上 dragonll.com |
+| --- | --- | --- |
+| posts | **3** | 0 |
+| siteInfo.title | **LongLi** | null |
+| 页面标题 | LongLi \| Building, Learning... | `undefined \| undefined` |
+| sitemap | 10 条（含 3 篇文章） | 0 篇文章 |
+
+本地能读出的 3 篇：《what is DragonLL》《Arabic Letters Pronunciation Player》《Getting Into Padel》。
+`yarn build` 还用真实数据预渲染出了他自己的标签（思考 / 文字 / 健康 / tools）。
+
+**所以结论是：Notion 好的、代码好的、部署环境坏的。** 剩下的排查全部集中在 Vercel：
+1. Vercel 上的 `NOTION_PAGE_ID` 是否等于上面这个值（**若该变量缺失会回退到官方 demo 从而显示 12 篇，
+   而线上是 0 篇 —— 说明它被设成了某个取不到数据的值**，这是最可疑的一条线索）
+2. 是否配了 `REDIS_URL` 之类的缓存后端而实例已失效
+3. Notion 对 Vercel 出口 IP 限流（旧配置 `NEXT_REVALIDATE_SECOND=5`，每 5 秒就可能回源一次；
+   合并后已跟随上游默认改为 60，上游同期新增 `RateLimiter.ts` 也指向这个方向）
 
 ## 5. 上游同步（2026-09-05 已完成一次）
 
