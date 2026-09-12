@@ -19,19 +19,19 @@ const BLOG = {
   AUTHOR: process.env.NEXT_PUBLIC_AUTHOR || 'Long Li (DragonLL)', // 您的昵称 例如 tangly1024
   BIO:
     process.env.NEXT_PUBLIC_BIO ||
-    'Lifelong learner & hands-on builder | QA Engineer in Abu Dhabi 🚀', // 作者简介
+    'Lifelong learner & hands-on builder. Inquiring, building tools, and exploring systems from engineering to living.', // 作者简介
   LINK: process.env.NEXT_PUBLIC_LINK || 'https://dragonll.com', // 网站地址
   KEYWORDS:
     process.env.NEXT_PUBLIC_KEYWORD ||
-    'QA Engineering, Software Testing, Tech Blog, Mobile Testing, Automation, Long Li', // 网站关键词 英文逗号隔开
+    'Software Systems, Tool Building, Tech Blog, Automation, Language Acquisition, Long Li, DragonLL', // 网站关键词 英文逗号隔开
 
   // 上游 v4.10 起把 TITLE/DESCRIPTION 从 blog.config 移除，改为只从 Notion 读取；
   // 但 components/SEO.js 等 8 处仍在调 siteConfig('TITLE')，Notion 抓取失败时会变成 undefined。
   // 这里保留兜底值，避免取数失败时页面标题渲染成 "undefined | undefined"。
-  TITLE: process.env.NEXT_PUBLIC_TITLE || 'DragonLL - Tech & QA Engineering Blog', // 站点标题，被 notion 中的页面标题覆盖
+  TITLE: process.env.NEXT_PUBLIC_TITLE || 'DragonLL - Building, Inquiring & Exploring', // 站点标题，被 notion 中的页面标题覆盖
   DESCRIPTION:
     process.env.NEXT_PUBLIC_DESCRIPTION ||
-    "Long Li's personal blog about QA Engineering, Software Testing, and Tech Insights. Based in Abu Dhabi, sharing experiences in mobile testing, automation, and software quality.", // 站点描述，被 notion 中的页面描述覆盖
+    "Long Li's personal site on software systems, tool building, language acquisition, and living. Building, Learning, Testing, Improving, Sharing.", // 站点描述，被 notion 中的页面描述覆盖
   BLOG_FAVICON: process.env.NEXT_PUBLIC_FAVICON || '/favicon.ico', // blog favicon 配置, 默认使用 /public/favicon.ico，支持在线图片，如 https://img.imesong.com/favicon.png
   PWA_ENABLE: process.env.NEXT_PUBLIC_PWA_ENABLE || false, // 是否启用 PWA 安装入口；也可在 Notion_Config 中配置 PWA_ENABLE=true
   PWA_NAME: process.env.NEXT_PUBLIC_PWA_NAME || '', // PWA 安装名称；默认读取站点标题，通常无需单独配置
